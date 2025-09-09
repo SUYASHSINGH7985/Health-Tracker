@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  username  String   @unique
+  bio       String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  habits      Habit[]
+  completions Completion[]
+  
+  // Friendship relations
+  following   Friendship[] @relation("Follower")
+  followers   Friendship[] @relation("Following")
+
+  @@map("users")
+}
+
+model Habit {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // health, study, personal, work
+  frequency   String   // daily, weekly
+  notes       String?
+  color       String?  @default("#3b82f6")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions Completion[]
+
+  // Prevent duplicate habit names per user
+  @@unique([userId, name])
+  @@map("habits")
+}
+
+model Completion {
+  id          String   @id @default(cuid())
+  completedAt DateTime @default(now())
+  notes       String?
+  
+  // Relations
+  habitId     String
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Prevent multiple completions per day for daily habits, per week for weekly habits
+  @@unique([habitId, completedAt])
+  @@map("completions")
+}
+
+model Friendship {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  followerId  String
+  followingId String
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  // Prevent duplicate friendships and self-following
+  @@unique([followerId, followingId])
+  @@map("friendships")
+}
