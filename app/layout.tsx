@@ -20,16 +20,36 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-      <body>
-        <Suspense fallback={<div>Loading...</div>}>
+    <html 
+      lang="en" 
+      suppressHydrationWarning
+      className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+    >
+      <body suppressHydrationWarning className="min-h-screen bg-background font-sans antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          enableColorScheme
+          storageKey="habits-theme"
+        >
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Suspense 
+              fallback={
+                <div className="flex h-screen w-full items-center justify-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
+                    <p className="text-sm text-muted-foreground">Loading...</p>
+                  </div>
+                </div>
+              }
+            >
               {children}
-            </ThemeProvider>
+            </Suspense>
           </AuthProvider>
-        </Suspense>
-        <Analytics />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
