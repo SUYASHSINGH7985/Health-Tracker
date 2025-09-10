@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async (redirectOnFailure = true) => {
     try {
-      console.log("AuthProvider: Checking auth status...")
+      console.log("Checking auth status...")
       
       const response = await fetch("/api/auth/me", {
         method: "GET",
@@ -45,39 +45,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
         },
-        cache: "no-store",
       })
 
-      console.log("AuthProvider: Auth check response status:", response.status)
-      console.log("AuthProvider: Auth check response headers:", {
-        contentType: response.headers.get("content-type"),
-        cookie: response.headers.get("set-cookie"),
-      })
+      console.log("Auth check response:", response.status)
       
       if (!response.ok) {
-        console.error("AuthProvider: Auth check failed with status:", response.status)
         throw new Error("Auth check failed")
       }
 
       const data = await response.json()
-      console.log("AuthProvider: Auth check response data:", data)
+      console.log("Auth check data:", data)
       
-      if (!data.user) {
-        console.error("AuthProvider: Invalid auth check response:", data)
+      if (data.user) {
+        setUser(data.user)
+        return true
+      } else {
         throw new Error("No user data received")
       }
-
-      console.log("AuthProvider: Setting user data:", data.user)
-      setUser(data.user)
-      return true
     } catch (error) {
-      console.error("AuthProvider: Auth check error:", error)
+      console.error("Auth check error:", error)
       setUser(null)
       
       if (redirectOnFailure && isProtectedRoute(window.location.pathname)) {
-        console.log("AuthProvider: Redirecting to auth page...")
         router.push("/auth")
       }
       return false
@@ -95,9 +85,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true)
     try {
-      console.log("AuthProvider: Attempting login with email:", email)
-      
-      const loginResponse = await fetch("/api/auth/login", {
+      console.log("Attempting login...")
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -107,87 +96,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       })
 
-      console.log("AuthProvider: Login response status:", loginResponse.status)
-      
-      if (!loginResponse.ok) {
-        const error = await loginResponse.json()
-        throw new Error(error.error || "Login failed")
+      console.log("Login response status:", response.status)
+      const data = await response.json()
+      console.log("Login response data:", data)
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed")
       }
 
-      const loginData = await loginResponse.json()
-      console.log("AuthProvider: Login successful, got user data:", loginData.user)
-
-      // Set user data immediately
-      setUser(loginData.user)
-      
-      // Wait a bit for cookie to be set
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      // Verify auth state
-      console.log("AuthProvider: Verifying auth state...")
-      const authChecked = await checkAuth(false)
-      console.log("AuthProvider: Auth verification result:", authChecked)
-      
-      if (!authChecked) {
-        throw new Error("Authentication verification failed")
+      if (!data.user) {
+        throw new Error("No user data received")
       }
 
-      // Redirect to dashboard
-      console.log("AuthProvider: Auth confirmed, redirecting to dashboard...")
+      // Set the user data immediately
+      setUser(data.user)
+      
+      // Navigate to dashboard on success
+      console.log("Login successful, redirecting to dashboard...")
       router.push("/dashboard")
     } catch (error) {
-      console.error("AuthProvider: Login error:", error)
-      setUser(null)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const signup = async (email: string, password: string, username: string) => {
-    setLoading(true)
-    try {
-      console.log("AuthProvider: Attempting signup...")
-      const signupResponse = await fetch("/api/auth/signup", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, username }),
-      })
-
-      console.log("AuthProvider: Signup response status:", signupResponse.status)
-
-      if (!signupResponse.ok) {
-        const error = await signupResponse.json()
-        throw new Error(error.error || "Signup failed")
-      }
-
-      const signupData = await signupResponse.json()
-      console.log("AuthProvider: Signup successful, got user data:", signupData.user)
-
-      // Set user data immediately
-      setUser(signupData.user)
-
-      // Wait a bit for cookie to be set
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      // Verify auth state
-      console.log("AuthProvider: Verifying auth state after signup...")
-      const authChecked = await checkAuth(false)
-      console.log("AuthProvider: Auth verification result:", authChecked)
-      
-      if (!authChecked) {
-        throw new Error("Authentication verification failed")
-      }
-
-      // Redirect to dashboard
-      console.log("AuthProvider: Auth confirmed, redirecting to dashboard...")
-      router.push("/dashboard")
-    } catch (error) {
-      console.error("AuthProvider: Signup error:", error)
+      console.error("Login error:", error)
       setUser(null)
       throw error
     } finally {

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Target, Mail, Lock, User, AlertCircle, CheckCircle2 } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
 
 interface FormData {
   email: string
@@ -26,7 +27,7 @@ interface FormErrors {
 }
 
 export default function AuthPage() {
-  const router = useRouter()
+  const { login, signup, loading: authLoading } = useAuth()
   const [activeTab, setActiveTab] = useState("login")
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -80,28 +81,16 @@ export default function AuthPage() {
     setErrors({})
 
     try {
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup"
-      const payload = isLogin
-        ? { email: formData.email, password: formData.password }
-        : { email: formData.email, password: formData.password, username: formData.username }
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setErrors({ general: data.error || "Something went wrong" })
-        return
+      if (isLogin) {
+        await login(formData.email, formData.password)
+      } else {
+        await signup(formData.email, formData.password, formData.username)
       }
-
-      // Redirect to dashboard on success
-      router.push("/dashboard")
     } catch (error) {
-      setErrors({ general: "Network error. Please try again." })
+      console.error("Auth error:", error)
+      setErrors({ 
+        general: error instanceof Error ? error.message : "Authentication failed" 
+      })
     } finally {
       setIsLoading(false)
     }
@@ -114,6 +103,8 @@ export default function AuthPage() {
       setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
   }
+
+  const loading = isLoading || authLoading
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex">
@@ -225,8 +216,8 @@ export default function AuthPage() {
                       {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                     </div>
 
-                    <Button onClick={() => handleSubmit(true)} disabled={isLoading} className="w-full">
-                      {isLoading ? "Signing in..." : "Sign In"}
+                    <Button onClick={() => handleSubmit(true)} disabled={loading} className="w-full">
+                      {loading ? "Signing in..." : "Sign In"}
                     </Button>
                   </div>
                 </TabsContent>
@@ -297,8 +288,8 @@ export default function AuthPage() {
                       {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                     </div>
 
-                    <Button onClick={() => handleSubmit(false)} disabled={isLoading} className="w-full">
-                      {isLoading ? "Creating account..." : "Create Account"}
+                    <Button onClick={() => handleSubmit(false)} disabled={loading} className="w-full">
+                      {loading ? "Creating account..." : "Create Account"}
                     </Button>
                   </div>
                 </TabsContent>

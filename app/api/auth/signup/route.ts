@@ -80,17 +80,43 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate authentication token
-    const token = generateToken(newUser.id)
+    console.log("Generating JWT token...")
+    const token = await generateToken(newUser.id)
+    console.log("Token generated, length:", token.length)
 
     // Create response with user data
     const response = NextResponse.json({
+      success: true,
       user: newUser,
       message: "Registration successful"
     }, { status: 201 })
 
-    // Set authentication cookie
-    setAuthCookie(response, token)
+    // Set secure httpOnly cookie with proper attributes
+    console.log("Setting auth cookie...")
+    response.cookies.set("auth-token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      priority: "high"
+    })
 
+    // Log cookie details
+    const cookies = response.headers.get('set-cookie')
+    console.log("Cookie header set:", cookies ? "Yes" : "No")
+    console.log("Cookie details:", {
+      name: "auth-token",
+      options: {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      }
+    })
+
+    console.log("Sending signup response...")
     return response
   } catch (error) {
     console.error("Signup error:", error)
