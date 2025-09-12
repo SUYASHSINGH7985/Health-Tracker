@@ -5,6 +5,7 @@ A modern, full-stack habit tracking application built with Next.js 14, TypeScrip
 ## 🚀 Features
 
 ### Core Features
+
 - **User Authentication**: Secure JWT-based authentication with email/password
 - **Habit Management**: Create, edit, delete, and track daily/weekly habits
 - **Progress Tracking**: Visual progress indicators, streak counters, and completion statistics
@@ -13,6 +14,7 @@ A modern, full-stack habit tracking application built with Next.js 14, TypeScrip
 - **Responsive Design**: Mobile-first design that works on all devices
 
 ### Technical Features
+
 - **Next.js 14**: App Router, Server Components, and API Routes
 - **TypeScript**: Full type safety throughout the application
 - **Prisma ORM**: Type-safe database operations with PostgreSQL
@@ -32,7 +34,8 @@ A modern, full-stack habit tracking application built with Next.js 14, TypeScrip
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - PostgreSQL database
 - npm or yarn
 
@@ -52,25 +55,33 @@ A modern, full-stack habit tracking application built with Next.js 14, TypeScrip
 3. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    \`\`\`env
+
    # Database
+
    DATABASE_URL="postgresql://username:password@localhost:5432/habitflow"
-   
+
    # Authentication
+
    JWT_SECRET="your-super-secret-jwt-key-here"
-   
+
    # Next.js
+
    NEXTAUTH_URL="http://localhost:3000"
    \`\`\`
 
 4. **Set up the database**
    \`\`\`bash
+
    # Generate Prisma client
+
    npx prisma generate
-   
+
    # Run database migrations
+
    npx prisma db push
-   
+
    # Seed the database (optional)
+
    npx prisma db seed
    \`\`\`
 
@@ -92,6 +103,7 @@ The application uses the following main entities:
 - **Friendship**: Social connections between users
 
 ### Key Relationships
+
 - Users can have multiple habits
 - Habits can have multiple completions
 - Users can follow other users (many-to-many relationship)
@@ -99,12 +111,14 @@ The application uses the following main entities:
 ## 🔧 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/signup` - Create new user account
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/me` - Get current user info
 
 ### Habits
+
 - `GET /api/habits` - Get user's habits with statistics
 - `POST /api/habits` - Create new habit
 - `PUT /api/habits/[id]` - Update habit
@@ -113,12 +127,14 @@ The application uses the following main entities:
 - `DELETE /api/habits/[id]/checkin` - Undo habit check-in
 
 ### Social Features
+
 - `GET /api/friends` - Get friends and activity feed
 - `POST /api/friends` - Follow a user
 - `DELETE /api/friends/[userId]` - Unfollow a user
 - `GET /api/users/search` - Search for users to follow
 
 ### Profile
+
 - `GET /api/profile` - Get user profile with statistics
 - `PUT /api/profile` - Update user profile
 
@@ -127,6 +143,7 @@ The application uses the following main entities:
 ### Frontend Deployment (Vercel)
 
 1. **Connect to Vercel**
+
    - Push your code to GitHub
    - Connect your repository to Vercel
    - Vercel will automatically detect Next.js and configure build settings
@@ -146,18 +163,21 @@ The application uses the following main entities:
 ### Database Deployment Options
 
 #### Option 1: Railway
+
 1. Create account at [Railway](https://railway.app)
 2. Create new PostgreSQL database
 3. Copy connection string to `DATABASE_URL`
 4. Run migrations: `npx prisma db push`
 
 #### Option 2: Supabase
+
 1. Create account at [Supabase](https://supabase.com)
 2. Create new project with PostgreSQL
 3. Copy connection string to `DATABASE_URL`
 4. Run migrations: `npx prisma db push`
 
 #### Option 3: Neon
+
 1. Create account at [Neon](https://neon.tech)
 2. Create new PostgreSQL database
 3. Copy connection string to `DATABASE_URL`
@@ -183,6 +203,7 @@ The application uses the following main entities:
 ## 📱 Usage
 
 ### Getting Started
+
 1. **Sign Up**: Create an account with email and password
 2. **Create Habits**: Add your first habit with name, category, and frequency
 3. **Track Progress**: Check in daily/weekly to build streaks
@@ -190,12 +211,14 @@ The application uses the following main entities:
 5. **Stay Motivated**: View friends' activity and celebrate achievements
 
 ### Habit Categories
+
 - **Health & Fitness**: Exercise, nutrition, sleep habits
 - **Learning & Study**: Reading, courses, skill development
 - **Personal Development**: Meditation, journaling, self-care
 - **Work & Productivity**: Planning, focus, professional growth
 
 ### Social Features
+
 - **Activity Feed**: See friends' recent habit completions
 - **Following System**: Follow users to see their progress
 - **Profile Sharing**: Showcase your habit statistics and achievements
@@ -212,6 +235,7 @@ The application uses the following main entities:
 ## 🧪 Testing
 
 ### Manual Testing Checklist
+
 - [ ] User registration and login
 - [ ] Habit creation, editing, and deletion
 - [ ] Daily and weekly check-ins
@@ -222,6 +246,7 @@ The application uses the following main entities:
 - [ ] Responsive design on mobile/desktop
 
 ### Edge Cases Covered
+
 - Duplicate habit names per user (prevented)
 - Multiple check-ins per day/week (prevented)
 - Self-following (prevented)
@@ -263,5 +288,3 @@ If you encounter any issues:
 
 Built with ❤️ using Next.js, TypeScript, and modern web technologies.
 \`\`\`
-
-```json file="" isHidden
