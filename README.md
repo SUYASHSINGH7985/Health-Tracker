@@ -286,5 +286,5 @@ If you encounter any issues:
 
 ---
 
-Built with ❤️ using Next.js, TypeScript, and modern web technologiess.
+Built with ❤️ using Next.js, Typescript, and modern web technologies.
 \`\`\`
